@@ -1,51 +1,28 @@
-require './htl_define'
-require './hotel'
-require './reservinfo'
-
-class HotelFactory
-  include HotelDefine
-
-  def self.createHotel(name, rating,regular_price_info,reward_price_info)
-    hotel = Hotel.new(name, rating)
-    hotel.set_price_info(customer_type = RAGULAR_CUSTOMER, weekday_price = regular_price_info[WEEKDAY], weekend_price = regular_price_info[WEEKEND])
-    hotel.set_price_info(customer_type = REWARDS_CUSTOMER, weekday_price = reward_price_info[WEEKDAY], weekend_price = reward_price_info[WEEKEND])
-    return hotel
-  end
-end
-
+require 'yaml'
+require_relative './hotel'
+require_relative './reserv_parser'
 
 
 class HotelSystem
-  include HotelDefine
-  attr_accessor :hotels_list
+  attr_reader :hotels_list
 
-  def initialize()
-    @hotels_list = []
-    init_default_hotels
-  end
+  def initialize(config_file)
+    config_info = config_file.class == Hash ? config_file:YAML.load(File.read(config_file))
+    @hotels_list =config_info['hotels'].map { |hotel_info| Hotel.new(name=hotel_info['name'],
+                                                                     rating=hotel_info['rating']).
+        set_price_info('rewards', hotel_info['rewards']['weekdayprice'], hotel_info['rewards']['weekendprice']).
+        set_price_info('regular', hotel_info['regular']['weekdayprice'], hotel_info['regular']['weekendprice']) }
 
-  def init_default_hotels()
-    @hotels_list<<HotelFactory.createHotel(name="Lakewood", rating=3, regular_price_info = {WEEKDAY=>110, WEEKEND=>90}, reward_price_info={WEEKDAY=>80, WEEKEND=>80})
-    @hotels_list<<HotelFactory.createHotel(name="Bridgewood", rating=4, regular_price_info = {WEEKDAY=>160, WEEKEND=>60}, reward_price_info={WEEKDAY=>110, WEEKEND=>50})
-    @hotels_list<<HotelFactory.createHotel(name="Ridgewood", rating=5, regular_price_info = {WEEKDAY=>220, WEEKEND=>150}, reward_price_info={WEEKDAY=>100, WEEKEND=>40})
   end
 
 
   def find_cheapes_hotel(live_str)
-    revers_info = ReservInfo.new
-    if revers_info.extract_live_time(live_str)
-      return @hotels_list.sort! { |a, b| (a.compute_price(revers_info)<=>b.compute_price(revers_info)).nonzero? || (b.rating<=>a.rating) }[0].name
+    revers_info = ReservParser.extract_reserv_info(live_str)
+    if revers_info.valid?
+      @hotels_list.sort! { |a, b| (a.compute_price(revers_info)<=>b.compute_price(revers_info)).nonzero? || (b.rating<=>a.rating) }.first.name
     else
-      return "%s is invalid format" % live_str
+      "%s is invalid format" % live_str
     end
   end
 end
 
-
-#find_cheapes_hotel# ss=%q(Regular 16Mar2009(mon), 17Mar2009(tues), 18Mar2009(wed))
-# puts ReservInfo.new.extract_live_time ss
-#a = /([^:]+?):(.*?\(.*?\),?)+?/.match(ss)
-#a.captures.each{|item| puts (item)}
-# regx =/([^,()]+),*/
-# regx =/.*?\(([^\(\)]*)\),*/
-# ss.scan(regx).each { |x| puts x }x
