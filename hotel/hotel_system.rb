@@ -34,7 +34,7 @@ class HotelSystem
   def find_cheapes_hotel(live_str)
     revers_info = ReservInfo.new
     if revers_info.extract_live_time(live_str)
-      return @hotels_list.sort! { |a, b| a.compute_price(revers_info)<=>b.compute_price(revers_info) }[0].name
+      return @hotels_list.sort! { |a, b| (a.compute_price(revers_info)<=>b.compute_price(revers_info)).nonzero? || (b.rating<=>a.rating) }[0].name
     else
       return "%s is invalid format" % live_str
     end
