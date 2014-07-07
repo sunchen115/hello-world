@@ -1,0 +1,17 @@
+desc "job1"
+task :install do
+puts 'install'
+sh('bundle install')
+end
+
+desc 'job2'
+task :spec =>:install do
+#bundle install
+sh('rspec -I ./spec')
+puts 'spec'
+end
+
+desc 'job3'
+task 'pack' do
+puts 'pack'
+end

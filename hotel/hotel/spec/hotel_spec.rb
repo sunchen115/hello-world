@@ -1,6 +1,6 @@
 require 'rspec'
-require_relative '../lib/hotel_plugin/hotel'
-require_relative '../lib/hotel_plugin/reserv_parser'
+require_relative '../hotel'
+require_relative '../reserv_parser'
 
 describe 'Hotel' do
 

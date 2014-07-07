@@ -1,5 +1,5 @@
 require 'rspec'
-require_relative '../lib/hotel_plugin/reserv_parser'
+require_relative '../reserv_parser'
 describe 'ReservParser' do
 
   it 'should extract reserv_info valid for valid string' do

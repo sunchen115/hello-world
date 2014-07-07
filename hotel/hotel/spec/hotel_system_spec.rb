@@ -1,5 +1,5 @@
 require 'rspec'
-require_relative '../lib/hotel_plugin/hotel_system'
+require_relative '../hotel_system'
 
 describe 'HotelSystem' do
 
