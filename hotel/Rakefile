@@ -7,7 +7,7 @@ end
 desc 'run spec'
 task :spec =>:install do
 #bundle install
-sh('rspec ./spec')
+sh('bundle exec rspec ./spec')
 puts 'spec'
 end
 
